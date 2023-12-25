@@ -1,6 +1,6 @@
 import React from "react";
 import Nav from "../fetures/Navbar/Nav";
-import ProductList from "../fetures/product/ProductList";
+import ProductList from "../fetures/product/Components/ProductList";
 
 function Home() {
   return (

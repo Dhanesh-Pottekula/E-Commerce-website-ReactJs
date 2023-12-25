@@ -2,20 +2,21 @@
 import './App.css';
 
 import CartPage from './pages/CartPage';
-import Checkout from './pages/CheckOut';
+
 import Home from './pages/Home';
 import LoginPage from './pages/LoginPage';
+import ProductsDetailsPage from './pages/ProductsDetailsPage';
 import SignUpPage from './pages/SignUpPage';
 
 
 import * as React from "react";
-import { createRoot } from "react-dom/client";
+
 import {
   createBrowserRouter,
   RouterProvider,
-  Route,
-  Link,
+  
 } from "react-router-dom";
+import CheckOutPage from './pages/CheckOutPage';
 
 
 
@@ -35,7 +36,11 @@ const router = createBrowserRouter([
     element: <CartPage/>,
   },{
     path: "/checkout",
-    element: <Checkout/>,
+    element: <CheckOutPage/>,
+  },
+  {
+    path: "/productDetails",
+    element: <ProductsDetailsPage/>,
   },
 ]);
 
