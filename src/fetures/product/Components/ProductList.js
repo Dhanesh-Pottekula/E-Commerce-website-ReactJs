@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import {
@@ -8,32 +8,12 @@ import {
   PlusIcon,
   Squares2X2Icon,
 } from "@heroicons/react/20/solid";
-
+import {useSelector,useDispatch } from "react-redux";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { Link } from "react-router-dom";
+import { fetchallProductsAsync, selectAllProducts } from "../ProductSlice";
 
-const products = [
-  {
-    id: 1,
-    name: "Basic Tee",
-    href: "#",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg",
-    imageAlt: "Front of men's Basic Tee in black.",
-    price: "$35",
-    color: "Black",
-  },
-  {
-    id: 2,
-    name: "Basic Tee",
-    href: "#",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/product-page-01-related-product-01.jpg",
-    imageAlt: "Front of men's Basic Tee in black.",
-    price: "$35",
-    color: "Black",
-  },
-];
+
 
 const sortOptions = [
   { name: "Most Popular", href: "#", current: true },
@@ -111,6 +91,15 @@ function classNames(...classes) {
 }
 
 export default function ProductList() {
+  const dispatch = useDispatch();
+
+  useEffect(()=>{
+      dispatch(fetchallProductsAsync())
+    },[dispatch])
+  const products =useSelector(selectAllProducts)
+
+  
+  
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   return (
@@ -377,30 +366,46 @@ export default function ProductList() {
                           <div key={product.id} className="group relative">
                             <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
                               <img
-                                src={product.imageSrc}
-                                alt={product.imageAlt}
+                                src={product.thumbnail}
+                                alt={product.title}
                                 className="h-full w-full object-cover object-center lg:h-full lg:w-full"
                               />
                             </div>
 
                             <div className="mt-4 flex justify-between">
                               <div>
-                                <h3 className="text-sm text-gray-700">
-                                  <a href={product.href}>
+                                <h2 className="text-sm text-gray-700">
+                                  <a href={product.thumbnail}>
                                     <span
                                       aria-hidden="true"
                                       className="absolute inset-0"
                                     />
-                                    {product.name}
+                                    {product.title}
+                                  </a>
+                                </h2>
+                                <h3 className="text-sm text-gray-500">
+                                  <a href={product.thumbnail}>
+                                    <span
+                                      aria-hidden="true"
+                                      className="absolute inset-0"
+                                    />
+                                    Stock {product.stock}
                                   </a>
                                 </h3>
+                                
                                 <p className="mt-1 text-sm text-gray-500">
-                                  {product.color}
+                                  Rating {product.rating}
                                 </p>
                               </div>
-                              <p className="text-sm font-medium text-gray-900">
-                                {product.price}
+                              <div className="flex flex-col">
+                              <p className="text-sm font-medium text-stone-500 line-through ">
+                                $ {product.price}
                               </p>
+                              <p className="text-sm font-medium text-gray-900">
+                                $ {(product.price - (product.discountPercentage/100)*product.price)}
+                              </p>
+                              </div>
+                              
                             </div>
                           </div>
                         </Link>

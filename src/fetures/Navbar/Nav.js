@@ -25,9 +25,12 @@ const userNavigation = [
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
+
 }
 
 export default function Nav({ children }) {
+
+  console.log("nav bar component")
   return (
     <>
       <div className="min-h-full">

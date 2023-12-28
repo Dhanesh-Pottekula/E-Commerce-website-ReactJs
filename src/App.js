@@ -1,58 +1,53 @@
+import "./App.css";
 
-import './App.css';
+import CartPage from "./pages/CartPage";
 
-import CartPage from './pages/CartPage';
-
-import Home from './pages/Home';
-import LoginPage from './pages/LoginPage';
-import ProductsDetailsPage from './pages/ProductsDetailsPage';
-import SignUpPage from './pages/SignUpPage';
-
+import Home from "./pages/Home";
+import LoginPage from "./pages/LoginPage";
+import ProductsDetailsPage from "./pages/ProductsDetailsPage";
+import SignUpPage from "./pages/SignUpPage";
 
 import * as React from "react";
 
-import {
-  createBrowserRouter,
-  RouterProvider,
-  
-} from "react-router-dom";
-import CheckOutPage from './pages/CheckOutPage';
-
-
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import CheckOutPage from "./pages/CheckOutPage";
+import { Provider } from "react-redux";
+import { store } from "./app/store";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element:  <Home/>,
+    element: <Home />,
   },
   {
     path: "/login",
-    element: <LoginPage/>,
-  },{
+    element: <LoginPage />,
+  },
+  {
     path: "/signup",
-    element: <SignUpPage/>,
-  },{
+    element: <SignUpPage />,
+  },
+  {
     path: "/cart",
-    element: <CartPage/>,
-  },{
+    element: <CartPage />,
+  },
+  {
     path: "/checkout",
-    element: <CheckOutPage/>,
+    element: <CheckOutPage />,
   },
   {
     path: "/productDetails",
-    element: <ProductsDetailsPage/>,
+    element: <ProductsDetailsPage />,
   },
 ]);
 
-
-  
-  
-  function App() {
-    return (
+function App() {
+  return (
+    <Provider store={store}>
       <div className="App">
-      <RouterProvider router={router} />
-     
-    </div>
+        <RouterProvider router={router} />
+      </div>
+    </Provider>
   );
 }
 
