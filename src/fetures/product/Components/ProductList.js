@@ -12,16 +12,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import { Link } from "react-router-dom";
 import {
-  fetchallProductsAsync,
   fetchallProductsByFilterAsync,
   selectAllProducts,
+  selecttotalitems,
 } from "../ProductSlice";
 
 const sortOptions = [
-
-  { name: "Best Rating", sort: "rating",  order:"desc", current: false },
-  { name: "Price: Low to High", sort: "price", order:"asc", current: false },
-  { name: "Price: High to Low", sort: "price",order:"desc", current: false },
+  { name: "Best Rating", sort: "rating", order: "desc", current: false },
+  { name: "Price: Low to High", sort: "price", order: "asc", current: false },
+  { name: "Price: High to Low", sort: "price", order: "desc", current: false },
 ];
 
 const filters = [
@@ -222,31 +221,49 @@ export default function ProductList() {
   const dispatch = useDispatch();
 
   const products = useSelector(selectAllProducts);
-
+  const totalitems=useSelector(selecttotalitems)
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [filter, setfilter] = useState({});
+  const [sort, setsort] = useState({});
+  const [page, setpage] = useState(1);
+  const limit = 10;
 
-  
   const handleFilter = (e, section, option) => {
-    
-    const newfilter ={ ...filter }
-    if (e.target.checked){
-      newfilter[section.id]= option.value
-    }else{
-      delete newfilter[section.id]
+    const newfilter = { ...filter };
+   
+    if (e.target.checked) {
+      if (newfilter[section.id]) {
+        newfilter[section.id].push(option.value);
+      } else {
+        newfilter[section.id] = [];
+        newfilter[section.id].push(option.value);
+      }
+    } else {
+      const index = newfilter[section.id].findIndex(
+        (el) => el === option.value
+      );
+      newfilter[section.id].splice(index, 1);
     }
+    console.log(newfilter);
     setfilter(newfilter);
   };
 
- const handleSort= (e,option)=>{
-   const newfilter ={ ...filter, _sort: option.sort,_order:option.order}
-    setfilter(newfilter)
-  }
-  useEffect(
-    ()=>{
-      dispatch(fetchallProductsByFilterAsync(filter))
-    },[dispatch,filter]
-  )
+  const handleSort = (e, option) => {
+    const sorting = { _sort: option.sort, _order: option.order };
+    setsort(sorting);
+  };
+  const handlePagination = (page) => {
+    setpage(page);
+  };
+
+  useEffect(() => {
+    const pagination = { _page: page, _limit: 10 };
+    dispatch(fetchallProductsByFilterAsync({ filter, sort, pagination }));
+  }, [dispatch, filter, sort, page]);
+
+  useEffect(()=>{
+    setpage(1)
+  },[totalitems,sort])
   return (
     <div className="bg-white">
       <div>
@@ -403,7 +420,7 @@ export default function ProductList() {
                                 active ? "bg-gray-100" : "",
                                 "block px-4 py-2 text-sm"
                               )}
-                              onClick={(e)=>handleSort(e,option)}
+                              onClick={(e) => handleSort(e, option)}
                             >
                               {option.name}
                             </p>
@@ -512,7 +529,7 @@ export default function ProductList() {
                     </h2>
 
                     <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-                      {products.map((product) => (
+                      {products?.map((product) => (
                         <Link to="/productDetails">
                           <div key={product.id} className="group relative">
                             <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
@@ -589,9 +606,10 @@ export default function ProductList() {
             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm text-gray-700">
-                  Showing <span className="font-medium">1</span> to{" "}
-                  <span className="font-medium">10</span> of{" "}
-                  <span className="font-medium">97</span> results
+                  Showing{" "}
+                  <span className="font-medium">{(page - 1) * 10 + 1}</span> to{" "}
+                  <span className="font-medium">{page * 10}</span> of{" "}
+                  <span className="font-medium">{totalitems}</span> results
                 </p>
               </div>
               <div>
@@ -607,19 +625,22 @@ export default function ProductList() {
                     <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
                   </a>
                   {/* Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0" */}
-                  <a
-                    href="#"
-                    aria-current="page"
-                    className="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                  >
-                    1
-                  </a>
-                  <a
-                    href="#"
-                    className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-                  >
-                    2
-                  </a>
+                  {Array.from({ length: Math.ceil(totalitems / 10) }).map(
+                    (el, index) => {
+                      return (
+                        <a
+                          href="#"
+                          aria-current="page"
+                          className={`relative z-10 inline-flex items-center ${(index+1)===page? `bg-indigo-600 text-white`:` text-indigo-600 bg-white`}  px-4 py-2 text-sm font-semibold  focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
+                          onClick={(e) => {
+                            handlePagination(index + 1);
+                          }}
+                        >
+                          {index + 1}
+                        </a>
+                      );
+                    }
+                  )}
 
                   <a
                     href="#"

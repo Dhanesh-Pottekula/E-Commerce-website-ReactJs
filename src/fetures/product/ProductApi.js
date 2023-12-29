@@ -16,23 +16,35 @@ export async function fetchallProducts (){
             }
         }
 
-        export async function fetchallProductsByFilter (filter){
+        export async function fetchallProductsByFilter ({filter,sort,pagination}){
             let queryString=``;
-            console.log(filter)
+            
             for (let key in filter){
-                queryString += `${key}=${filter[key]}&`
+                for (let key2 in filter[key]){
+                    queryString =queryString+`${key}=${filter[key][key2]}&`
+                }
+            }
+            if (sort){
+                queryString+=`_sort=${sort._sort}&_order=${sort._order}&`
+                console.log(sort)
+            }
+            for (let key in pagination){
+                queryString+=`${key}=${pagination[key]}&`
+                
             }
             try {
 
                 const response = await fetch("http://localhost:3001/products?"+queryString)
                 console.log("http://localhost:3001/products?"+queryString)
+                console.log(response)
                 if (!response.ok) {
                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
- 
                 const data = await response.json()
-                
-                return({data})
+                const totalitems = await response.headers.get("X-Total-Count")
+                return({data:{
+                    products:data,totalitems:totalitems
+                }})
             } catch (error) {
                 console.error('There was an error with the fetch operation: ', error);
                 return(error);
