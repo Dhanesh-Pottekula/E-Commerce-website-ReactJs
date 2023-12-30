@@ -1,23 +1,34 @@
 import{ createAsyncThunk , createSlice} from "@reduxjs/toolkit"
-import { fetchallProducts,fetchallProductsByFilter } from "./ProductApi"
+import {fetchallProductsByFilter, fetchallProductsById } from "./ProductApi"
 
 
 const initialState={
     product:[],
     status:"idle",
     totalitems:0,
+    selectedProduct:null,
 }
 
-export const fetchallProductsAsync = createAsyncThunk(
-    'product/fetchallProducts',
-    async ()=>{
+// export const fetchallProductsAsync = createAsyncThunk(
+//     'product/fetchallProducts',
+//     async ()=>{
         
-        const response = await fetchallProducts();
+//         const response = await fetchallProducts();
         
+//         return response.data
+        
+//     }
+// )
+export const fetchallProductsByIdAsync = createAsyncThunk(
+    'product/fetchallProductsById',
+    async ({id})=>{
+        console.log("called 1111")
+        const response = await fetchallProductsById({id});
         return response.data
         
     }
 )
+
 
 export const fetchallProductsByFilterAsync = createAsyncThunk(
     'product/fetchallProductsByFilter',
@@ -40,17 +51,6 @@ export const productSlice = createSlice({
     },
     extraReducers:(builder)=>{
         builder
-            .addCase(fetchallProductsAsync.pending, (state)=>{
-                state.status = "loading";
-                
-            })
-            .addCase(fetchallProductsAsync.fulfilled,(state,action)=>{
-                state.status = "idle";
-
-                state.product = action.payload;
-
-
-            })
             .addCase(fetchallProductsByFilterAsync.pending, (state)=>{
                 state.status = "loading";
                 
@@ -62,10 +62,19 @@ export const productSlice = createSlice({
                 state.totalitems=action.payload.totalitems;
 
             })
+            .addCase(fetchallProductsByIdAsync.pending,(state)=>{
+                state.status="loading";
+            })
+            .addCase(fetchallProductsByIdAsync.fulfilled,(state,action)=>{
+                state.status = "idle";
+                state.selectedProduct = action.payload;
+                console.log(action.payload)
+            })
     }
 })
 
 export const {increment }= productSlice.actions;
 export const selectAllProducts =(state)=> state.product.product;
 export const selecttotalitems=(state)=>state.product.totalitems;
+export const selectProductbyId=(state)=> state.product.selectedProduct;
 export default productSlice.reducer;

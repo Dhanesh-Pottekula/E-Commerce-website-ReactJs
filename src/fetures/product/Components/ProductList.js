@@ -189,29 +189,6 @@ const filters = [
 ];
 
 // pagination consts
-const items = [
-  {
-    id: 1,
-    title: "Back End Developer",
-    department: "Engineering",
-    type: "Full-time",
-    location: "Remote",
-  },
-  {
-    id: 2,
-    title: "Front End Developer",
-    department: "Engineering",
-    type: "Full-time",
-    location: "Remote",
-  },
-  {
-    id: 3,
-    title: "User Interface Designer",
-    department: "Design",
-    type: "Full-time",
-    location: "Remote",
-  },
-];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -226,8 +203,7 @@ export default function ProductList() {
   const [filter, setfilter] = useState({});
   const [sort, setsort] = useState({});
   const [page, setpage] = useState(1);
-  const limit = 10;
-
+  const totalpages=Math.ceil(totalitems / 10);
   const handleFilter = (e, section, option) => {
     const newfilter = { ...filter };
    
@@ -530,7 +506,7 @@ export default function ProductList() {
 
                     <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
                       {products?.map((product) => (
-                        <Link to="/productDetails">
+                        <Link to={`/productDetails/${product.id}`}>
                           <div key={product.id} className="group relative">
                             <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
                               <img
@@ -590,18 +566,18 @@ export default function ProductList() {
 
           <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
             <div className="flex flex-1 justify-between sm:hidden">
-              <a
-                href="#"
+              <div
+                onClick={()=>{handlePagination(page>1?page-1:page)}}
                 className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 Previous
-              </a>
-              <a
-                href="#"
+              </div>
+              <div
+               onClick={()=>{handlePagination(page<totalpages?page+1:page)}}
                 className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 Next
-              </a>
+              </div>
             </div>
             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
               <div>
@@ -617,19 +593,18 @@ export default function ProductList() {
                   className="isolate inline-flex -space-x-px rounded-md shadow-sm"
                   aria-label="Pagination"
                 >
-                  <a
-                    href="#"
+                  <div
+                    onClick={()=>{handlePagination(page>1?page-1:page)}}
                     className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                   >
                     <span className="sr-only">Previous</span>
                     <ChevronLeftIcon className="h-5 w-5" aria-hidden="true" />
-                  </a>
+                  </div>
                   {/* Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0" */}
-                  {Array.from({ length: Math.ceil(totalitems / 10) }).map(
+                  {Array.from({ length: totalpages }).map(
                     (el, index) => {
                       return (
                         <a
-                          href="#"
                           aria-current="page"
                           className={`relative z-10 inline-flex items-center ${(index+1)===page? `bg-indigo-600 text-white`:` text-indigo-600 bg-white`}  px-4 py-2 text-sm font-semibold  focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600`}
                           onClick={(e) => {
@@ -642,13 +617,13 @@ export default function ProductList() {
                     }
                   )}
 
-                  <a
-                    href="#"
+                  <div
+                    onClick={()=>{handlePagination(page<totalpages?page+1:page)}}
                     className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                   >
                     <span className="sr-only">Next</span>
                     <ChevronRightIcon className="h-5 w-5" aria-hidden="true" />
-                  </a>
+                  </div>
                 </nav>
               </div>
             </div>
